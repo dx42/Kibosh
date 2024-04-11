@@ -31,8 +31,9 @@ class KiboshRunnerTest extends AbstractKiboshTest {
     private String tempDir;
     private Path filePath1, filePath2, filePath3, filePath4;
 
-    private Rule rule = mock(Rule.class);
-    private List<Rule> rules = list(rule);
+    private Rule rule1 = mock(Rule.class);
+    private Rule rule2 = mock(Rule.class);
+    private List<Rule> rules = list(rule1, rule2);
 
     @BeforeEach
     void beforeEach() throws IOException {
@@ -70,15 +71,15 @@ class KiboshRunnerTest extends AbstractKiboshTest {
 
         @Test
         void SingleViolation() throws IOException {
-            when(rule.applyToFile(filePath1)).thenReturn(list(VIOLATION1));
+            when(rule1.applyToFile(filePath1)).thenReturn(list(VIOLATION1));
             assertViolations(VIOLATION1);
         }
 
         @Test
         void MultipleViolation() throws IOException {
-            when(rule.applyToFile(filePath1)).thenReturn(list(VIOLATION1));
-            when(rule.applyToFile(filePath2)).thenReturn(list(VIOLATION2));
-            when(rule.applyToFile(filePath3)).thenReturn(list(VIOLATION3));
+            when(rule1.applyToFile(filePath1)).thenReturn(list(VIOLATION1));
+            when(rule2.applyToFile(filePath2)).thenReturn(list(VIOLATION2));
+            when(rule1.applyToFile(filePath3)).thenReturn(list(VIOLATION3));
             assertViolations(VIOLATION1, VIOLATION2, VIOLATION3);
         }
 
@@ -86,7 +87,7 @@ class KiboshRunnerTest extends AbstractKiboshTest {
         void IgnoresNonJavaFiles() throws IOException {
             Path path = Paths.get(tempDir, "SomeFile.txt");
             Files.createFile(path);
-            when(rule.applyToFile(path)).thenThrow(new RuntimeException());
+            when(rule1.applyToFile(path)).thenThrow(new RuntimeException());
 
             KiboshRunner kiboshRunner = new KiboshRunner(tempDir);
             kiboshRunner.applyRules(rules);

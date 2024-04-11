@@ -36,7 +36,7 @@ public class KiboshFileVisitor extends SimpleFileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         log.info("visitFile: file={}", file);
         if (pathMatcher.matches(file.getFileName())) {
-            violations.addAll(rules.get(0).applyToFile(file));
+            rules.stream().forEach(rule -> violations.addAll(rule.applyToFile(file)));
         }
         return FileVisitResult.CONTINUE;
     }
