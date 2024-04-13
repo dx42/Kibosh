@@ -58,6 +58,35 @@ class TextRuleTest extends AbstractKiboshTest {
             }
         }
 
+        @Nested
+        class IllegalRegularExpression {
+
+            TextRule rule = textRuleBuilder()
+                    .illegalRegularExpression("abc")
+                    .illegalRegularExpression("begin.*end")
+                    .build();
+
+            @Test
+            void NoOccurrences() {
+                TextRule.readFile = p -> "12345";
+                assertNoViolation(rule);
+            }
+
+            @Test
+            void SingleOccurrence() {
+                TextRule.readFile = p -> "other.. abc ^&*$%#";
+                assertViolation(rule, "illegal regular expression /abc/");
+            }
+
+            @Test
+            void MultipleOccurrences_SingleViolation() {
+                TextRule.readFile = p -> "begin 999 end       abc\n     begin$$$$end";
+                assertViolation(rule,
+                        "illegal regular expression /abc/",
+                        "illegal regular expression /begin.*end/");
+            }
+        }
+
         private TextRule.TextRuleBuilder textRuleBuilder() {
             return TextRule.builder()
                     .name(NAME)
