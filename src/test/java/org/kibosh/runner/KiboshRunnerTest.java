@@ -19,7 +19,6 @@ import java.util.List;
 
 class KiboshRunnerTest extends AbstractKiboshTest {
 
-    private static final String BASE_DIRECTORY = "src/test/resources/sampledir";
     private static final Violation VIOLATION1 = Violation.builder().message("m1").build();
     private static final Violation VIOLATION2 = Violation.builder().message("m2").build();
     private static final Violation VIOLATION3 = Violation.builder().message("m3").build();

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.kibosh.rule.Rule;
 import org.kibosh.rule.Violation;
 
-import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
@@ -20,7 +19,7 @@ public class KiboshFileVisitor extends SimpleFileVisitor<Path> {
 
     private final List<Rule> rules;
     private final String fileNamePattern = "*.java";
-    private PathMatcher pathMatcher;
+    private final PathMatcher pathMatcher;
 
     @Getter
     private final List<Violation> violations = new ArrayList<>();
@@ -33,10 +32,10 @@ public class KiboshFileVisitor extends SimpleFileVisitor<Path> {
     }
 
     @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
         log.info("visitFile: file={}", file);
         if (pathMatcher.matches(file.getFileName())) {
-            rules.stream().forEach(rule -> violations.addAll(rule.applyToFile(file)));
+            rules.forEach(rule -> violations.addAll(rule.applyToFile(file)));
         }
         return FileVisitResult.CONTINUE;
     }
