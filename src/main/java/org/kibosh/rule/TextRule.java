@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,7 +19,11 @@ import java.util.regex.Pattern;
 @Builder
 public class TextRule implements Rule {
 
-    public static final String QUOTES = "\"";
+    private static final String QUOTES = "\"";
+
+    // For testing
+    protected static Function<Path, String> readFile = TextRule::readFileContents;
+
     private final String name;
     private final String description;
 
@@ -27,8 +33,7 @@ public class TextRule implements Rule {
     @Singular
     List<String> illegalRegularExpressions;
 
-    // For testing
-    protected static Function<Path, String> readFile = TextRule::readFileContents;
+    private final Map<String, Pattern> illegalRegularExpressionPatterns = new LinkedHashMap<>();
 
     @Override
     public List<Violation> applyToFile(Path path) {
@@ -56,7 +61,7 @@ public class TextRule implements Rule {
 
     private void checkForIllegalRegularExpressions(Path path, String fileContents, List<Violation> violations) {
         for (String illegalRegex: illegalRegularExpressions) {
-            Pattern pattern = Pattern.compile(illegalRegex);
+            Pattern pattern = patternForRegex(illegalRegex);
             Matcher matcher = pattern.matcher(fileContents);
             if (matcher.find()) {
                 String message = messagePrefix(path) + "contains illegal regular expression /" +  illegalRegex + "/";
@@ -71,6 +76,13 @@ public class TextRule implements Rule {
 
     private String messagePrefix(Path path) {
         return name + ": " + quoted(description) + "; " + "File=[" + path.getFileName() + "] ";
+    }
+
+    private Pattern patternForRegex(String regex) {
+        if (!illegalRegularExpressionPatterns.containsKey(regex)) {
+            illegalRegularExpressionPatterns.put(regex, Pattern.compile(regex));
+        }
+        return illegalRegularExpressionPatterns.get(regex);
     }
 
     private String quoted(String string) {
