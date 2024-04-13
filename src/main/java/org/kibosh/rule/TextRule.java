@@ -90,7 +90,6 @@ public class TextRule implements Rule {
     }
 
     private static String readFileContents(Path path) {
-        log.info("readFileContents: path={}", path);
         try {
             byte[] bytes = Files.readAllBytes(path);
             return new String(bytes);

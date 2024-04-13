@@ -33,7 +33,6 @@ public class KiboshFileVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-        log.info("visitFile: file={}", file);
         if (pathMatcher.matches(file.getFileName())) {
             rules.forEach(rule -> violations.addAll(rule.applyToFile(file)));
         }

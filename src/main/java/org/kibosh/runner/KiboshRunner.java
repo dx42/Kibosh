@@ -1,8 +1,8 @@
 package org.kibosh.runner;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.kibosh.rule.Rule;
-import org.kibosh.rule.Violation;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,7 +20,8 @@ public class KiboshRunner {
         this.baseDirectory = baseDirectory;
     }
 
-    public void applyRules(List<Rule> rules) throws IOException {
+    @SneakyThrows(IOException.class)
+    public void applyRules(List<Rule> rules) {
         Path startingDir = Paths.get(baseDirectory);
 
         KiboshFileVisitor visitor = new KiboshFileVisitor(rules);
@@ -28,7 +29,7 @@ public class KiboshRunner {
 
         if (!visitor.getViolations().isEmpty()) {
             String violationsOnePerLine = visitor.getViolations().stream()
-                    .map(Violation::toString)
+                    .map(v -> "- " + v.getMessage())
                     .collect(Collectors.joining("\n    "));
             log.error("There were violations: \n    {}", violationsOnePerLine);
             throw new KiboshViolationsException(visitor.getViolations());
