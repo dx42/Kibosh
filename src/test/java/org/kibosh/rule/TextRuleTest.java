@@ -17,7 +17,8 @@ class TextRuleTest extends AbstractKiboshTest {
 
     private static final String NAME = "MyRule";
     private static final String DESCRIPTION = "Description123";
-    private static final Path PATH = Paths.get("some/path");
+    private static final String FILE_NAME = "SomeFile.java";
+    private static final Path PATH = Paths.get("some", FILE_NAME);
 
     @Nested
     class applyToFile {
@@ -85,6 +86,42 @@ class TextRuleTest extends AbstractKiboshTest {
                         "illegal regular expression /abc/",
                         "illegal regular expression /begin.*end/");
             }
+        }
+
+        @Nested
+        class ExcludeFilenames {
+
+            @Test
+            void ExcludedFile_ExactFilename_NoViolations() {
+                TextRule rule = textRuleBuilder()
+                        .illegalString("abc")
+                        .excludeFilename("other.txt")
+                        .excludeFilename(FILE_NAME)
+                        .build();
+                TextRule.readFile = p -> "abc";
+                assertNoViolation(rule);
+            }
+
+            @Test
+            void ExcludedFile_Wildcards_NoViolations() {
+                TextRule rule = textRuleBuilder()
+                        .illegalString("abc")
+                        .excludeFilename("S*.java")
+                        .build();
+                TextRule.readFile = p -> "abc";
+                assertNoViolation(rule);
+            }
+
+            @Test
+            void NotExcludedFile_Violation() {
+                TextRule rule = textRuleBuilder()
+                        .illegalString("abc")
+                        .excludeFilename("*.txt")
+                        .build();
+                TextRule.readFile = p -> "abc";
+                assertViolation(rule, "abc");
+            }
+
         }
 
         private TextRule.TextRuleBuilder textRuleBuilder() {

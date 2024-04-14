@@ -5,8 +5,10 @@ import lombok.Singular;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,17 +35,35 @@ public class TextRule implements Rule {
     @Singular
     List<String> illegalRegularExpressions;
 
+    /** Filenames to skip applying this rule. May contain wildcards ('*' or '?'). */
+    @Singular
+    List<String> excludeFilenames;
+
     private final Map<String, Pattern> illegalRegularExpressionPatterns = new LinkedHashMap<>();
 
     @Override
     public List<Violation> applyToFile(Path path) {
-        String fileContents = readFile.apply(path);
         List<Violation> violations = new ArrayList<>();
 
+        if (shouldExcludeFile(path)) {
+            return violations;
+        }
+
+        String fileContents = readFile.apply(path);
         checkForIllegalStrings(path, fileContents, violations);
         checkForIllegalRegularExpressions(path, fileContents, violations);
 
         return violations;
+    }
+
+    private boolean shouldExcludeFile(Path path) {
+        for (String excludeFilename: excludeFilenames) {
+            PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:" + excludeFilename);
+            if (pathMatcher.matches(path.getFileName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void checkForIllegalStrings(Path path, String fileContents, List<Violation> violations) {
