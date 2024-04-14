@@ -1,11 +1,11 @@
-package org.kibosh.rule;
+package org.dx42.kibosh.rule;
 
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.kibosh.test.AbstractKiboshTest;
+import org.dx42.kibosh.test.AbstractKiboshTest;
 
 import java.io.IOException;
 import java.nio.file.Files;

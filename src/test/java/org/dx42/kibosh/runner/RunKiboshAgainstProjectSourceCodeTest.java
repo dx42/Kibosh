@@ -1,9 +1,9 @@
-package org.kibosh.runner;
+package org.dx42.kibosh.runner;
 
 import org.junit.jupiter.api.Test;
-import org.kibosh.rule.Rule;
-import org.kibosh.rule.TextRule;
-import org.kibosh.test.AbstractKiboshTest;
+import org.dx42.kibosh.rule.Rule;
+import org.dx42.kibosh.rule.TextRule;
+import org.dx42.kibosh.test.AbstractKiboshTest;
 
 import java.util.List;
 

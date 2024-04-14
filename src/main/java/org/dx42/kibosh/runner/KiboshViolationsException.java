@@ -1,6 +1,6 @@
-package org.kibosh.runner;
+package org.dx42.kibosh.runner;
 
-import org.kibosh.rule.Violation;
+import org.dx42.kibosh.rule.Violation;
 
 import java.util.List;
 

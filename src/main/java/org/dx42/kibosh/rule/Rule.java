@@ -1,4 +1,4 @@
-package org.kibosh.rule;
+package org.dx42.kibosh.rule;
 
 import java.nio.file.Path;
 import java.util.List;

@@ -1,9 +1,9 @@
-package org.kibosh.runner;
+package org.dx42.kibosh.runner;
 
 import lombok.Builder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.kibosh.rule.Rule;
+import org.dx42.kibosh.rule.Rule;
 
 import java.io.IOException;
 import java.nio.file.Files;

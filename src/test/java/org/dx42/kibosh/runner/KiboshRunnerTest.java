@@ -1,15 +1,15 @@
-package org.kibosh.runner;
+package org.dx42.kibosh.runner;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import org.dx42.kibosh.rule.Violation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.kibosh.rule.Rule;
-import org.kibosh.rule.Violation;
-import org.kibosh.test.AbstractKiboshTest;
+import org.dx42.kibosh.rule.Rule;
+import org.dx42.kibosh.test.AbstractKiboshTest;
 
 import java.io.IOException;
 import java.nio.file.Files;

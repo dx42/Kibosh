@@ -1,4 +1,4 @@
-package org.kibosh.test;
+package org.dx42.kibosh.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

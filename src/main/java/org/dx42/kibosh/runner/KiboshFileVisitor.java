@@ -1,9 +1,9 @@
-package org.kibosh.runner;
+package org.dx42.kibosh.runner;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.kibosh.rule.Rule;
-import org.kibosh.rule.Violation;
+import org.dx42.kibosh.rule.Violation;
+import org.dx42.kibosh.rule.Rule;
 
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
