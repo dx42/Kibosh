@@ -1,5 +1,6 @@
 package org.kibosh.runner;
 
+import lombok.Builder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.kibosh.rule.Rule;
@@ -12,13 +13,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Builder
 public class KiboshRunner {
 
     private final String baseDirectory;
-
-    public KiboshRunner(String baseDirectory) {
-        this.baseDirectory = baseDirectory;
-    }
 
     @SneakyThrows(IOException.class)
     public void applyRules(List<Rule> rules) {

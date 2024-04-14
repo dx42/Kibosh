@@ -19,11 +19,11 @@ class RunKiboshAgainstProjectSourceCodeTest extends AbstractKiboshTest {
                         .build(),
                 TextRule.builder()
                         .name("ConsecutiveBlankLines")
-                        .description("Do not include more than one blank/empty lines")
+                        .description("Do not include consecutive blank/empty lines")
                         .illegalRegularExpression("\\n\\s*\\n\\s*\\n")
                         .build());
 
-        KiboshRunner runner = new KiboshRunner("src");
+        KiboshRunner runner = KiboshRunner.builder().baseDirectory("src").build();
         runner.applyRules(rules);
     }
 }

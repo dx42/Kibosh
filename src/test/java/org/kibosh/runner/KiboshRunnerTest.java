@@ -28,8 +28,7 @@ class KiboshRunnerTest extends AbstractKiboshTest {
 
     private KiboshRunner kiboshRunner;
     private String tempDir;
-    private Path filePath1, filePath2, filePath3, filePath4;
-
+    private Path filePath1, filePath2, filePath3, filePath4, emptySubdir;
     private Rule rule1 = mock(Rule.class);
     private Rule rule2 = mock(Rule.class);
     private List<Rule> rules = list(rule1, rule2);
@@ -37,14 +36,15 @@ class KiboshRunnerTest extends AbstractKiboshTest {
     @BeforeEach
     void beforeEach() throws IOException {
         tempDir = tempDirPath.toString();
-        log.info("tempDir={}", tempDir);
-        kiboshRunner = new KiboshRunner(tempDir);
+        kiboshRunner = KiboshRunner.builder().baseDirectory(tempDir).build();
         filePath1 = Paths.get(tempDir, "File1.java");
         filePath2 = Paths.get(tempDir, "File2.java");
         Path subdirectory = Paths.get(tempDir, "subdir");
         Files.createDirectory(subdirectory);
         filePath3 = Paths.get(subdirectory.toString(), "File3.java");
         filePath4 = Paths.get(subdirectory.toString(), "File4.java");
+        emptySubdir = Paths.get(tempDir, "emptySubdir");
+        Files.createDirectory(emptySubdir);
 
         Files.createFile(filePath1);
         Files.createFile(filePath2);
@@ -56,26 +56,26 @@ class KiboshRunnerTest extends AbstractKiboshTest {
     class applyRules {
 
         @Test
-        void NoFiles_NoViolations() throws IOException {
-            KiboshRunner kiboshRunner = new KiboshRunner(tempDir);
+        void NoFiles_NoViolations() {
+            kiboshRunner = KiboshRunner.builder().baseDirectory(emptySubdir.toString()).build();
             kiboshRunner.applyRules(rules);
         }
 
         @Test
         void Files_NoViolations() throws IOException {
             Files.createFile(Paths.get(tempDir, "SomeFile.java"));
-            KiboshRunner kiboshRunner = new KiboshRunner(tempDir);
+            KiboshRunner kiboshRunner = KiboshRunner.builder().baseDirectory(tempDir).build();
             kiboshRunner.applyRules(rules);
         }
 
         @Test
-        void SingleViolation() throws IOException {
+        void SingleViolation() {
             when(rule1.applyToFile(filePath1)).thenReturn(list(VIOLATION1));
             assertViolations(VIOLATION1);
         }
 
         @Test
-        void MultipleViolation() throws IOException {
+        void MultipleViolation() {
             when(rule1.applyToFile(filePath1)).thenReturn(list(VIOLATION1));
             when(rule2.applyToFile(filePath2)).thenReturn(list(VIOLATION2));
             when(rule1.applyToFile(filePath3)).thenReturn(list(VIOLATION3));
@@ -87,12 +87,10 @@ class KiboshRunnerTest extends AbstractKiboshTest {
             Path path = Paths.get(tempDir, "SomeFile.txt");
             Files.createFile(path);
             when(rule1.applyToFile(path)).thenThrow(new RuntimeException());
-
-            KiboshRunner kiboshRunner = new KiboshRunner(tempDir);
             kiboshRunner.applyRules(rules);
         }
 
-        private void assertViolations(Violation... expectedViolations) throws IOException {
+        private void assertViolations(Violation... expectedViolations) {
             try {
                 kiboshRunner.applyRules(rules);
                 fail("Expected KiboshViolationsException");
