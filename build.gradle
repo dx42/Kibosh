@@ -6,6 +6,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
+    id("eu.kakde.gradle.sonatype-maven-central-publisher") version "1.0.6"
 }
 
 version = "0.1.0"
@@ -44,17 +45,54 @@ test {
 //------------------------------------------------------------------------------
 // Publish to Maven Central
 //------------------------------------------------------------------------------
+sonatypeCentralPublishExtension {
+    // Set group ID, artifact ID, version, and other publication details
+    groupId.set("org.dx42")
+    artifactId.set("Kibosh")
+    version.set("0.1.0")
+    componentType.set("java") // "java" or "versionCatalog"
+    publishingType.set("AUTOMATIC") // USER_MANAGED or AUTOMATIC
 
-signing {
-    required { gradle.taskGraph.hasTask(publish) }
-    sign publishing.publications
+    // Set username and password for Sonatype repository
+    username.set(sonatypeUsername)
+    password.set(sonatypePassword)
+
+    // Configure POM metadata
+    pom {
+        name.set("Kibosh")
+        description.set("The Kibosh project provides simple static analysis for Java source files designed to be run as part of a test suite.")
+        url.set("https://github.com/dx42/Kibosh")
+        licenses {
+            license {
+                name.set('The Apache License, Version 2.0')
+                url.set('http://www.apache.org/licenses/LICENSE-2.0.txt')
+            }
+        }
+        developers {
+            developer {
+                id.set("chrismair")
+                name.set("Chris Mair")
+                organization.set("dx42")
+                organizationUrl.set("dx42.org")
+            }
+        }
+        scm {
+            url.set("https://github.com/dx42/Kibosh")
+            connection.set('scm:git:git@github.com:dx42/Kibosh.git')
+            developerConnection.set('scm:git:git@github.com:dx42/Kibosh.git')
+        }
+        issueManagement {
+            system.set("GitHub")
+            url.set("https://github.com/dx42/Kibosh.git/issues")
+        }
+    }
 }
 
 // Publish to Sonatype (OSSRH) Maven Repository
 // See http://central.sonatype.org/pages/gradle.html
 publishing {
     publications {
-        maven(MavenPublication) {
+        mavenJava(MavenPublication) {
             from components.java
 
             pom {
@@ -86,15 +124,23 @@ publishing {
         }
     }
 
+    println "sonatypeUsername=" + sonatypeUsername
+    println "sonatypePassword=" + sonatypePassword
+
     repositories {
         maven {
-            def releasesUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-            def snapshotsUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
-            url = version.endsWith('SNAPSHOT') ? snapshotsUrl : releasesUrl
+            name = "OSSRH"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+
             credentials {
-                username = ossrhUsername
-                password = ossrhPassword
+                username = sonatypeUsername
+                password = sonatypePassword
             }
         }
     }
+
+    signing {
+        sign publishing.publications.mavenJava
+    }
+
 }
