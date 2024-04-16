@@ -28,7 +28,7 @@ class KiboshRunnerTest extends AbstractKiboshTest {
 
     private KiboshRunner kiboshRunner;
     private String tempDir;
-    private Path filePath1, filePath2, filePath3, filePath4, emptySubdir;
+    private Path filePath1, filePath2, filePath3, filePath4, subdir1, subdir2;
     private Rule rule1 = mock(Rule.class);
     private Rule rule2 = mock(Rule.class);
     private List<Rule> rules = list(rule1, rule2);
@@ -39,12 +39,12 @@ class KiboshRunnerTest extends AbstractKiboshTest {
         kiboshRunner = KiboshRunner.builder().baseDirectory(tempDir).build();
         filePath1 = Paths.get(tempDir, "File1.java");
         filePath2 = Paths.get(tempDir, "File2.java");
-        Path subdirectory = Paths.get(tempDir, "subdir");
-        Files.createDirectory(subdirectory);
-        filePath3 = Paths.get(subdirectory.toString(), "File3.java");
-        filePath4 = Paths.get(subdirectory.toString(), "File4.java");
-        emptySubdir = Paths.get(tempDir, "emptySubdir");
-        Files.createDirectory(emptySubdir);
+        subdir1 = Paths.get(tempDir, "subdir1");
+        Files.createDirectory(subdir1);
+        filePath3 = Paths.get(subdir1.toString(), "File3.java");
+        filePath4 = Paths.get(subdir1.toString(), "File4.java");
+        subdir2 = Paths.get(tempDir, "subdir2");
+        Files.createDirectory(subdir2);
 
         Files.createFile(filePath1);
         Files.createFile(filePath2);
@@ -57,7 +57,7 @@ class KiboshRunnerTest extends AbstractKiboshTest {
 
         @Test
         void NoFiles_NoViolations() {
-            kiboshRunner = KiboshRunner.builder().baseDirectory(emptySubdir.toString()).build();
+            kiboshRunner = KiboshRunner.builder().baseDirectory(subdir2.toString()).build();
             kiboshRunner.applyRules(rules);
         }
 
@@ -79,6 +79,23 @@ class KiboshRunnerTest extends AbstractKiboshTest {
             when(rule1.applyToFile(filePath1)).thenReturn(list(VIOLATION1));
             when(rule2.applyToFile(filePath2)).thenReturn(list(VIOLATION2));
             when(rule1.applyToFile(filePath3)).thenReturn(list(VIOLATION3));
+            assertViolations(VIOLATION1, VIOLATION2, VIOLATION3);
+        }
+
+        @Test
+        void MultipleBaseDirectories() throws IOException {
+            Path filePath5 = Paths.get(subdir2.toString(), "SomeFile.java");
+            Files.createFile(filePath5);
+
+            when(rule1.applyToFile(filePath3)).thenReturn(list(VIOLATION1));
+            when(rule2.applyToFile(filePath4)).thenReturn(list(VIOLATION2));
+            when(rule1.applyToFile(filePath5)).thenReturn(list(VIOLATION3));
+
+            kiboshRunner = KiboshRunner.builder()
+                    .baseDirectory(subdir1.toString())
+                    .baseDirectory(subdir2.toString())
+                    .build();
+
             assertViolations(VIOLATION1, VIOLATION2, VIOLATION3);
         }
 
