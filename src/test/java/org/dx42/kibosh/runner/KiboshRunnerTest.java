@@ -1,6 +1,7 @@
 package org.dx42.kibosh.runner;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.dx42.kibosh.rule.Violation.Severity.*;
 import static org.mockito.Mockito.*;
 
 import org.dx42.kibosh.rule.Violation;
@@ -21,7 +22,7 @@ class KiboshRunnerTest extends AbstractKiboshTest {
 
     private static final Violation VIOLATION1 = Violation.builder().message("m1").build();
     private static final Violation VIOLATION2 = Violation.builder().message("m2").build();
-    private static final Violation VIOLATION3 = Violation.builder().message("m3").build();
+    private static final Violation VIOLATION3 = Violation.builder().severity(WARNING).message("m3").build();
 
     @TempDir
     Path tempDirPath;
@@ -75,11 +76,19 @@ class KiboshRunnerTest extends AbstractKiboshTest {
         }
 
         @Test
+        void SingleViolation_WARNING() {
+            when(rule1.applyToFile(filePath1)).thenReturn(list(VIOLATION3));
+
+            // Does not throw an exception
+            kiboshRunner.applyRules(rules);
+        }
+
+        @Test
         void MultipleViolation() {
             when(rule1.applyToFile(filePath1)).thenReturn(list(VIOLATION1));
             when(rule2.applyToFile(filePath2)).thenReturn(list(VIOLATION2));
             when(rule1.applyToFile(filePath3)).thenReturn(list(VIOLATION3));
-            assertViolations(VIOLATION1, VIOLATION2, VIOLATION3);
+            assertViolations(VIOLATION1, VIOLATION2);   // does not include WARNING violations
         }
 
         @Test
@@ -96,7 +105,7 @@ class KiboshRunnerTest extends AbstractKiboshTest {
                     .baseDirectory(subdir2.toString())
                     .build();
 
-            assertViolations(VIOLATION1, VIOLATION2, VIOLATION3);
+            assertViolations(VIOLATION1, VIOLATION2);   // does not include WARNING violations
         }
 
         @Test

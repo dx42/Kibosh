@@ -1,10 +1,13 @@
 package org.dx42.kibosh.runner;
 
+import static org.dx42.kibosh.rule.Violation.Severity.*;
+
 import lombok.Builder;
 import lombok.Singular;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dx42.kibosh.rule.Rule;
+import org.dx42.kibosh.rule.Violation;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,12 +38,28 @@ public class KiboshRunner {
     }
 
     private void checkForViolations(KiboshFileVisitor visitor) {
-        if (!visitor.getViolations().isEmpty()) {
-            String violationsOnePerLine = visitor.getViolations().stream()
-                    .map(v -> "- " + v.getMessage())
-                    .collect(Collectors.joining("\n    "));
-            log.error("There were violations: \n    {}", violationsOnePerLine);
-            throw new KiboshViolationsException(visitor.getViolations());
+        List<Violation> warningViolations = getViolationsBySeverity(visitor.getViolations(), WARNING);
+        logViolations(warningViolations, WARNING);
+
+        List<Violation> errorViolations = getViolationsBySeverity(visitor.getViolations(), ERROR);
+        logViolations(errorViolations, ERROR);
+
+        if (!errorViolations.isEmpty()) {
+            throw new KiboshViolationsException(errorViolations);
         }
     }
+
+    private static void logViolations(List<Violation> violations, Violation.Severity severity) {
+        if (!violations.isEmpty()) {
+            String violationsOnePerLine = violations.stream()
+                    .map(v -> "- " + v.getMessage())
+                    .collect(Collectors.joining("\n    "));
+            log.warn("There were {} violations: \n    {}", severity, violationsOnePerLine);
+        }
+    }
+
+    private static List<Violation> getViolationsBySeverity(List<Violation> violations, Violation.Severity severity) {
+        return violations.stream().filter(v -> v.getSeverity() == severity).collect(Collectors.toList());
+    }
+
 }
