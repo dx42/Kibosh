@@ -3,6 +3,7 @@ package org.dx42.kibosh.rule;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.extern.slf4j.Slf4j;
+import org.dx42.kibosh.rule.Violation.Severity;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -28,6 +29,9 @@ public class TextRule implements Rule {
 
     private final String name;
     private final String description;
+
+    @Builder.Default
+    private Severity severity = Severity.ERROR;
 
     @Singular
     List<String> illegalStrings;
@@ -70,11 +74,7 @@ public class TextRule implements Rule {
         for (String illegalString: illegalStrings) {
             if (fileContents.contains(illegalString)) {
                 String message = messagePrefix(path) + "contains illegal string " +  quoted(illegalString);
-                Violation violation = Violation.builder()
-                        .rule(this)
-                        .message(message)
-                        .build();
-                violations.add(violation);
+                addViolation(violations, message);
             }
         }
     }
@@ -85,11 +85,7 @@ public class TextRule implements Rule {
             Matcher matcher = pattern.matcher(fileContents);
             if (matcher.find()) {
                 String message = messagePrefix(path) + "contains illegal regular expression /" +  illegalRegex + "/";
-                Violation violation = Violation.builder()
-                        .rule(this)
-                        .message(message)
-                        .build();
-                violations.add(violation);
+                addViolation(violations, message);
             }
         }
     }
@@ -103,6 +99,15 @@ public class TextRule implements Rule {
             illegalRegularExpressionPatterns.put(regex, Pattern.compile(regex));
         }
         return illegalRegularExpressionPatterns.get(regex);
+    }
+
+    private void addViolation(List<Violation> violations, String message) {
+        Violation violation = Violation.builder()
+                .rule(this)
+                .severity(severity)
+                .message(message)
+                .build();
+        violations.add(violation);
     }
 
     private String quoted(String string) {

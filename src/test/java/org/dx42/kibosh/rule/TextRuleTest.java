@@ -1,6 +1,7 @@
 package org.dx42.kibosh.rule;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.dx42.kibosh.rule.Violation.Severity.*;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,8 @@ class TextRuleTest extends AbstractKiboshTest {
     private static final String DESCRIPTION = "Description123";
     private static final String FILE_NAME = "SomeFile.java";
     private static final Path PATH = Paths.get("some", FILE_NAME);
+
+    private Violation.Severity expectedSeverity = ERROR;
 
     @Nested
     class applyToFile {
@@ -124,6 +127,22 @@ class TextRuleTest extends AbstractKiboshTest {
 
         }
 
+        @Nested
+        class Severity {
+
+            @Test
+            void FailOnViolations_false() {
+                TextRule rule = textRuleBuilder()
+                        .illegalString("abc")
+                        .severity(WARNING)
+                        .build();
+                TextRule.readFile = p -> "abc";
+                expectedSeverity = WARNING;
+                assertViolation(rule, "abc");
+            }
+
+        }
+
         private TextRule.TextRuleBuilder textRuleBuilder() {
             return TextRule.builder()
                     .name(NAME)
@@ -143,6 +162,7 @@ class TextRuleTest extends AbstractKiboshTest {
             int messageIndex = 0;
             for (Violation violation: violations) {
                 assertThat(violation.getRule()).isEqualTo(rule);
+                assertThat(violation.getSeverity()).isEqualTo(expectedSeverity);
                 assertThat(violation.getMessage()).contains(NAME, DESCRIPTION, violationMessages[messageIndex]);
                 messageIndex++;
             }
