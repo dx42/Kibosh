@@ -1,8 +1,3 @@
----
-layout: default
-title: FakeFtpServer Filesystems
----
-
 # TextRule
 
 The `TextRule` class implements the `Rule` interface, and enables checking for illegal strings or illegal regular expressions within a source file.

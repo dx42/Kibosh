@@ -23,7 +23,10 @@ class RunKiboshAgainstProjectSourceCodeTest {
                         .illegalRegularExpression("\\n\\s*\\n\\s*\\n")
                         .build());
 
-        KiboshRunner runner = KiboshRunner.builder().baseDirectory("src").build();
+        KiboshRunner runner = KiboshRunner.builder()
+                .baseDirectory("src/main/java")
+                .baseDirectory("src/test/java")
+                .build();
         runner.applyRules(rules);
     }
 }

@@ -33,13 +33,16 @@ class RunKiboshAgainstProjectSourceCodeTest {
                         .illegalRegularExpression("\\n\\s*\\n\\s*\\n")
                         .build());
 
-        KiboshRunner runner = KiboshRunner.builder().baseDirectory("src").build();
+        KiboshRunner runner = KiboshRunner.builder()
+                .baseDirectory("src/main/java")
+                .baseDirectory("src/test/java")
+                .build();
         runner.applyRules(rules);
     }
 }
 ```
 
-See [TextRule](https://github.com/dx42/Kibosh/blob/main/docs/TextRule.md).
+See [TextRule](docs/TextRule.md) and [KiboshRunner](docs/KiboshRunner.md).
 
 ## Maven Support
 
