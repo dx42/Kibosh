@@ -38,3 +38,19 @@ class RunKiboshAgainstProjectSourceCodeTest {
     }
 }
 ```
+
+See [TextRule](https://github.com/dx42/Kibosh/blob/main/docs/TextRule.md).
+
+## Maven Support
+
+**Kibosh** is available from the **Maven Central Repository**:
+
+```
+  <dependency>
+    <groupId>org.dx42</groupId>
+    <artifactId>Kibosh</artifactId>
+    <version>0.2.0</version>
+    <scope>test</scope>
+  </dependency>
+```
+

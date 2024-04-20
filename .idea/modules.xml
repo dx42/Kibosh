@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Kibosh.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Kibosh.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Kibosh.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Kibosh.test.iml" />
     </modules>
   </component>
 </project>
