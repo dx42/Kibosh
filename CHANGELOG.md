@@ -1,5 +1,10 @@
 # Kibosh Change Log
 
+# Version 0.3.0
+
+ - `KiboshRunner`: Include link to source files when listing violations.
+
+
 ## Version 0.2.0
 
  - `README`: Add Maven dependency info. Add separate docs page for TextRule and KiboshRunner.

@@ -91,7 +91,7 @@ public class TextRule implements Rule {
     }
 
     private String messagePrefix(Path path) {
-        return name + ": " + quoted(description) + "; " + "File=[" + path.getFileName() + "] ";
+        return name + ": " + quoted(description) + "; " + "File=.(" + path.getFileName() + ":1) ";
     }
 
     private Pattern patternForRegex(String regex) {
