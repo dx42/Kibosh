@@ -125,6 +125,35 @@ class KiboshRunnerTest extends AbstractKiboshTest {
                 assertThat(violations).containsExactlyInAnyOrder(expectedViolations);
             }
         }
+
+    }
+
+    @Nested
+    class applyRules_List {
+
+        @Test
+        void Files_NoViolations() throws IOException {
+            Files.createFile(Paths.get(tempDir, "SomeFile.java"));
+            KiboshRunner kiboshRunner = KiboshRunner.builder().baseDirectory(tempDir).build();
+            kiboshRunner.applyRules(rule1, rule2);
+        }
+
+        @Test
+        void SingleViolation() {
+            when(rule1.applyToFile(filePath1)).thenReturn(list(VIOLATION1));
+            assertViolations(VIOLATION1);
+        }
+
+        private void assertViolations(Violation... expectedViolations) {
+            try {
+                kiboshRunner.applyRules(rule1, rule2);
+                fail("Expected KiboshViolationsException");
+            } catch(KiboshViolationsException e) {
+                List<Violation> violations = e.getViolations();
+                assertThat(violations).containsExactlyInAnyOrder(expectedViolations);
+            }
+        }
+
     }
 
 }

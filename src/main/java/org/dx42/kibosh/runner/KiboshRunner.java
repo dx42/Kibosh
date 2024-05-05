@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,10 @@ public class KiboshRunner {
         KiboshFileVisitor visitor = new KiboshFileVisitor(rules);
         walkFileTree(visitor);
         checkForViolations(visitor);
+    }
+
+    public void applyRules(Rule... rules) {
+        applyRules(Arrays.asList(rules));
     }
 
     private void walkFileTree(KiboshFileVisitor visitor) throws IOException {

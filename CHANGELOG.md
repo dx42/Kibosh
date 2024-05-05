@@ -3,6 +3,7 @@
 # Version 0.3.0
 
  - `KiboshRunner`: Include link to source files when listing violations.
+ - `KiboshRunner`: Specify rule list as a varargs parameter. Add `applyRules(Rule… rules)`.
 
 
 ## Version 0.2.0
