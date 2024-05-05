@@ -11,7 +11,7 @@ plugins {
 
 def GROUP_ID = "org.dx42"
 def ARTIFACT_ID = "Kibosh"
-def VERSION = "0.2.0"
+def VERSION = "0.3.0"
 
 version = VERSION
 group = GROUP_ID
