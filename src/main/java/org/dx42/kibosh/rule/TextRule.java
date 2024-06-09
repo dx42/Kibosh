@@ -37,10 +37,13 @@ public class TextRule implements Rule {
     List<String> illegalStrings;
 
     @Singular
+    List<String> illegalRegularExpressions;
+
+    @Singular
     List<String> requiredStrings;
 
     @Singular
-    List<String> illegalRegularExpressions;
+    List<String> requiredRegularExpressions;
 
     /** Filenames to skip applying this rule. May contain wildcards ('*' or '?'). */
     @Singular
@@ -58,8 +61,9 @@ public class TextRule implements Rule {
 
         String fileContents = readFile.apply(path);
         checkForIllegalStrings(path, fileContents, violations);
-        checkForRequiredStrings(path, fileContents, violations);
         checkForIllegalRegularExpressions(path, fileContents, violations);
+        checkForRequiredStrings(path, fileContents, violations);
+        checkForRequiredRegularExpressions(path, fileContents, violations);
 
         return violations;
     }
@@ -83,6 +87,17 @@ public class TextRule implements Rule {
         }
     }
 
+    private void checkForIllegalRegularExpressions(Path path, String fileContents, List<Violation> violations) {
+        for (String illegalRegex: illegalRegularExpressions) {
+            Pattern pattern = patternForRegex(illegalRegex);
+            Matcher matcher = pattern.matcher(fileContents);
+            if (matcher.find()) {
+                String message = messagePrefix(path) + "contains illegal regular expression /" +  illegalRegex + "/";
+                addViolation(violations, message);
+            }
+        }
+    }
+
     private void checkForRequiredStrings(Path path, String fileContents, List<Violation> violations) {
         for (String requiredString: requiredStrings) {
             if (!fileContents.contains(requiredString)) {
@@ -92,12 +107,12 @@ public class TextRule implements Rule {
         }
     }
 
-    private void checkForIllegalRegularExpressions(Path path, String fileContents, List<Violation> violations) {
-        for (String illegalRegex: illegalRegularExpressions) {
-            Pattern pattern = patternForRegex(illegalRegex);
+    private void checkForRequiredRegularExpressions(Path path, String fileContents, List<Violation> violations) {
+        for (String requiredRegex: requiredRegularExpressions) {
+            Pattern pattern = patternForRegex(requiredRegex);
             Matcher matcher = pattern.matcher(fileContents);
-            if (matcher.find()) {
-                String message = messagePrefix(path) + "contains illegal regular expression /" +  illegalRegex + "/";
+            if (!matcher.find()) {
+                String message = messagePrefix(path) + "does not contain required regular expression /" +  requiredRegex + "/";
                 addViolation(violations, message);
             }
         }

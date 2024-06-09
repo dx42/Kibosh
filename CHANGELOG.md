@@ -1,6 +1,9 @@
 # Kibosh Change Log
 
-# Version 0.3.0
+## TODO: Version 0.4.0
+ - `TextRule`: Add support for `requiredString` and `requiredRegularExpression`.
+
+## Version 0.3.0
 
  - `KiboshRunner`: Include link to source files when listing violations.
  - `KiboshRunner`: Specify rule list as a varargs parameter. Add `applyRules(Rule… rules)`.

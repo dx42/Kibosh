@@ -121,6 +121,35 @@ class TextRuleTest extends AbstractKiboshTest {
         }
 
         @Nested
+        class RequiredRegularExpression {
+
+            TextRule rule = textRuleBuilder()
+                    .requiredRegularExpression("abc")
+                    .requiredRegularExpression("begin.*end")
+                    .build();
+
+            @Test
+            void AllRequiredRegularExpressionPresent() {
+                TextRule.readFile = p -> "begin 999 end       abc\n     begin$$$$end";
+                assertNoViolation(rule);
+            }
+
+            @Test
+            void OnlyOneRequiredRegularExpressionPresent_SingleViolation() {
+                TextRule.readFile = p -> "other.. abc ^&*$%#";
+                assertViolations(rule, "required regular expression /begin.*end/");
+            }
+
+            @Test
+            void NoRequiredRegularExpressionsPresent_OneViolationForEachMissingRegularExpression() {
+                TextRule.readFile = p -> "12345";
+                assertViolations(rule,
+                        "required regular expression /abc/",
+                        "required regular expression /begin.*end/");
+            }
+        }
+
+        @Nested
         class ExcludeFilenames {
 
             @Test
