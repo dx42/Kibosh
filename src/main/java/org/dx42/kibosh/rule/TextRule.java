@@ -37,6 +37,9 @@ public class TextRule implements Rule {
     List<String> illegalStrings;
 
     @Singular
+    List<String> requiredStrings;
+
+    @Singular
     List<String> illegalRegularExpressions;
 
     /** Filenames to skip applying this rule. May contain wildcards ('*' or '?'). */
@@ -55,6 +58,7 @@ public class TextRule implements Rule {
 
         String fileContents = readFile.apply(path);
         checkForIllegalStrings(path, fileContents, violations);
+        checkForRequiredStrings(path, fileContents, violations);
         checkForIllegalRegularExpressions(path, fileContents, violations);
 
         return violations;
@@ -74,6 +78,15 @@ public class TextRule implements Rule {
         for (String illegalString: illegalStrings) {
             if (fileContents.contains(illegalString)) {
                 String message = messagePrefix(path) + "contains illegal string " +  quoted(illegalString);
+                addViolation(violations, message);
+            }
+        }
+    }
+
+    private void checkForRequiredStrings(Path path, String fileContents, List<Violation> violations) {
+        for (String requiredString: requiredStrings) {
+            if (!fileContents.contains(requiredString)) {
+                String message = messagePrefix(path) + "does not contain required string " +  quoted(requiredString);
                 addViolation(violations, message);
             }
         }

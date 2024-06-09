@@ -42,21 +42,21 @@ class TextRuleTest extends AbstractKiboshTest {
                     .build();
 
             @Test
-            void NoOccurrences() {
+            void NoOccurrences_NoViolations() {
                 TextRule.readFile = p -> "12345";
                 assertNoViolation(rule);
             }
 
             @Test
-            void SingleOccurrence() {
+            void SingleOccurrence_SingleViolation() {
                 TextRule.readFile = p -> "abc";
-                assertViolation(rule, "illegal string \"abc\"");
+                assertViolations(rule, "illegal string \"abc\"");
             }
 
             @Test
-            void MultipleOccurrences_SingleViolation() {
+            void MultipleOccurrences_MultipleViolations() {
                 TextRule.readFile = p -> "abc\n     xy   xy";
-                assertViolation(rule,
+                assertViolations(rule,
                         "illegal string \"abc\"",
                         "illegal string \"xy\"");
             }
@@ -71,23 +71,52 @@ class TextRuleTest extends AbstractKiboshTest {
                     .build();
 
             @Test
-            void NoOccurrences() {
+            void NoOccurrences_NoViolations() {
                 TextRule.readFile = p -> "12345";
                 assertNoViolation(rule);
             }
 
             @Test
-            void SingleOccurrence() {
+            void SingleOccurrence_SingleViolation() {
                 TextRule.readFile = p -> "other.. abc ^&*$%#";
-                assertViolation(rule, "illegal regular expression /abc/");
+                assertViolations(rule, "illegal regular expression /abc/");
             }
 
             @Test
-            void MultipleOccurrences_SingleViolation() {
+            void MultipleOccurrences_MultipleViolations() {
                 TextRule.readFile = p -> "begin 999 end       abc\n     begin$$$$end";
-                assertViolation(rule,
+                assertViolations(rule,
                         "illegal regular expression /abc/",
                         "illegal regular expression /begin.*end/");
+            }
+        }
+
+        @Nested
+        class RequiredString {
+
+            TextRule rule = textRuleBuilder()
+                    .requiredString("abc")
+                    .requiredString("xy")
+                    .build();
+
+            @Test
+            void AllRequiredStringsPresent() {
+                TextRule.readFile = p -> "abc\n     xy   xy";
+                assertNoViolation(rule);
+            }
+
+            @Test
+            void OnlyOneRequiredStringPresent_SingleViolation() {
+                TextRule.readFile = p -> "abc";
+                assertViolations(rule, "required string \"xy\"");
+            }
+
+            @Test
+            void NoRequiredStringsPresent_OneViolationForEachMissingString() {
+                TextRule.readFile = p -> "12345";
+                assertViolations(rule,
+                        "required string \"abc\"",
+                        "required string \"xy\"");
             }
         }
 
@@ -122,7 +151,7 @@ class TextRuleTest extends AbstractKiboshTest {
                         .excludeFilename("*.txt")
                         .build();
                 TextRule.readFile = p -> "abc";
-                assertViolation(rule, "abc");
+                assertViolations(rule, "abc");
             }
 
         }
@@ -138,7 +167,7 @@ class TextRuleTest extends AbstractKiboshTest {
                         .build();
                 TextRule.readFile = p -> "abc";
                 expectedSeverity = WARNING;
-                assertViolation(rule, "abc");
+                assertViolations(rule, "abc");
             }
 
         }
@@ -154,7 +183,7 @@ class TextRuleTest extends AbstractKiboshTest {
             assertThat(violations).isEmpty();
         }
 
-        private void assertViolation(Rule rule, String... violationMessages) {
+        private void assertViolations(Rule rule, String... violationMessages) {
             List<Violation> violations = rule.applyToFile(PATH);
             log.info("violations={}", violations);
 
