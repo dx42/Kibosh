@@ -2,6 +2,7 @@
 
 ## TODO: Version 0.4.0
  - `TextRule`: Add support for `requiredString` and `requiredRegularExpression`.
+ - `KiboshRunner`: Show number of warning and error violations.
 
 ## Version 0.3.0
 

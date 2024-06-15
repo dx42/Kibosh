@@ -59,7 +59,7 @@ public class KiboshRunner {
             String violationsOnePerLine = violations.stream()
                     .map(v -> "- " + v.getMessage())
                     .collect(Collectors.joining("\n    "));
-            log.warn("There were {} violations: \n    {}", severity, violationsOnePerLine);
+            log.warn("There were {} violations: \n    {}", violations.size() + " " + severity, violationsOnePerLine);
         }
     }
 
