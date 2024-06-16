@@ -46,7 +46,7 @@ See [TextRule](docs/TextRule.md) and [KiboshRunner](docs/KiboshRunner.md).
   <dependency>
     <groupId>org.dx42</groupId>
     <artifactId>Kibosh</artifactId>
-    <version>0.3.0</version>
+    <version>1.0.0</version>
     <scope>test</scope>
   </dependency>
 ```
