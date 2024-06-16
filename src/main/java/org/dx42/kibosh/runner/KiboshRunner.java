@@ -2,13 +2,6 @@ package org.dx42.kibosh.runner;
 
 import static org.dx42.kibosh.rule.Violation.Severity.*;
 
-import lombok.Builder;
-import lombok.Singular;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.dx42.kibosh.rule.Rule;
-import org.dx42.kibosh.rule.Violation;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +10,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.Builder;
+import lombok.Singular;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.dx42.kibosh.rule.Rule;
+import org.dx42.kibosh.rule.Violation;
+
 @Slf4j
 @Builder
 public class KiboshRunner {
@@ -24,9 +24,11 @@ public class KiboshRunner {
     @Singular
     private final List<String> baseDirectories;
 
+    private final String applyToFileNames;
+
     @SneakyThrows(IOException.class)
     public void applyRules(List<Rule> rules) {
-        KiboshFileVisitor visitor = new KiboshFileVisitor(rules);
+        KiboshFileVisitor visitor = new KiboshFileVisitor(rules, "glob:" + fileNamePattern());
         walkFileTree(visitor);
         checkForViolations(visitor);
     }
@@ -52,6 +54,10 @@ public class KiboshRunner {
         if (!errorViolations.isEmpty()) {
             throw new KiboshViolationsException(errorViolations);
         }
+    }
+
+    private String fileNamePattern() {
+        return applyToFileNames == null ? "*.java" : applyToFileNames;
     }
 
     private static void logViolations(List<Violation> violations, Violation.Severity severity) {

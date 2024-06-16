@@ -4,19 +4,19 @@ import static org.assertj.core.api.Assertions.*;
 import static org.dx42.kibosh.rule.Violation.Severity.*;
 import static org.mockito.Mockito.*;
 
-import org.dx42.kibosh.rule.Violation;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.dx42.kibosh.rule.Rule;
-import org.dx42.kibosh.test.AbstractKiboshTest;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
+import org.dx42.kibosh.rule.Rule;
+import org.dx42.kibosh.rule.Violation;
+import org.dx42.kibosh.test.AbstractKiboshTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class KiboshRunnerTest extends AbstractKiboshTest {
 
@@ -116,16 +116,6 @@ class KiboshRunnerTest extends AbstractKiboshTest {
             kiboshRunner.applyRules(rules);
         }
 
-        private void assertViolations(Violation... expectedViolations) {
-            try {
-                kiboshRunner.applyRules(rules);
-                fail("Expected KiboshViolationsException");
-            } catch(KiboshViolationsException e) {
-                List<Violation> violations = e.getViolations();
-                assertThat(violations).containsExactlyInAnyOrder(expectedViolations);
-            }
-        }
-
     }
 
     @Nested
@@ -144,16 +134,34 @@ class KiboshRunnerTest extends AbstractKiboshTest {
             assertViolations(VIOLATION1);
         }
 
-        private void assertViolations(Violation... expectedViolations) {
-            try {
-                kiboshRunner.applyRules(rule1, rule2);
-                fail("Expected KiboshViolationsException");
-            } catch(KiboshViolationsException e) {
-                List<Violation> violations = e.getViolations();
-                assertThat(violations).containsExactlyInAnyOrder(expectedViolations);
-            }
-        }
+    }
 
+    @Nested
+    class ApplyToFileNames {
+
+        @Test
+        void OtherThanJavaFile() throws IOException {
+            Path propertiesFilePath = Paths.get(subdir2.toString(), "SomeFile.properties");
+            Files.createFile(propertiesFilePath);
+            kiboshRunner = KiboshRunner.builder()
+                    .baseDirectory(tempDir)
+                    .applyToFileNames("*.properties")
+                    .build();
+
+            when(rule1.applyToFile(propertiesFilePath)).thenReturn(list(VIOLATION1));
+
+            assertViolations(VIOLATION1);
+        }
+    }
+
+    private void assertViolations(Violation... expectedViolations) {
+        try {
+            kiboshRunner.applyRules(rule1, rule2);
+            fail("Expected KiboshViolationsException");
+        } catch(KiboshViolationsException e) {
+            List<Violation> violations = e.getViolations();
+            assertThat(violations).containsExactlyInAnyOrder(expectedViolations);
+        }
     }
 
 }
