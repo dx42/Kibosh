@@ -1,6 +1,6 @@
 # Kibosh Change Log
 
-## TODO: Version 0.4.0
+## Version 1.0.0
  - `TextRule`: Add support for `requiredString` and `requiredRegularExpression`.
  - `KiboshRunner`: Make files to apply to configurable using new *applyToFileNames* property.
  - `KiboshRunner`: Show number of warning and error violations.
