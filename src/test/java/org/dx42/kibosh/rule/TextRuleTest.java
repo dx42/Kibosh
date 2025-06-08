@@ -3,16 +3,16 @@ package org.dx42.kibosh.rule;
 import static org.assertj.core.api.Assertions.*;
 import static org.dx42.kibosh.rule.Violation.Severity.*;
 
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.dx42.kibosh.test.AbstractKiboshTest;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
+import org.dx42.kibosh.test.AbstractKiboshTest;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class TextRuleTest extends AbstractKiboshTest {
 
@@ -24,7 +24,7 @@ class TextRuleTest extends AbstractKiboshTest {
     private Violation.Severity expectedSeverity = ERROR;
 
     @Nested
-    class applyToFile {
+    class ApplyToFile {
 
         @Test
         void DefaultConfiguration_NoViolations() {
@@ -50,15 +50,15 @@ class TextRuleTest extends AbstractKiboshTest {
             @Test
             void SingleOccurrence_SingleViolation() {
                 TextRule.readFile = p -> "abc";
-                assertViolations(rule, "illegal string \"abc\"");
+                assertSingleViolation(rule, "illegal string \"abc\"", 0);
             }
 
             @Test
             void MultipleOccurrences_MultipleViolations() {
                 TextRule.readFile = p -> "abc\n     xy   xy";
                 assertViolations(rule,
-                        "illegal string \"abc\"",
-                        "illegal string \"xy\"");
+                        "illegal string \"abc\"", 0,
+                        "illegal string \"xy\"", 0);
             }
         }
 
@@ -79,15 +79,15 @@ class TextRuleTest extends AbstractKiboshTest {
             @Test
             void SingleOccurrence_SingleViolation() {
                 TextRule.readFile = p -> "other.. abc ^&*$%#";
-                assertViolations(rule, "illegal regular expression /abc/");
+                assertSingleViolation(rule, "illegal regular expression /abc/", 0);
             }
 
             @Test
             void MultipleOccurrences_MultipleViolations() {
                 TextRule.readFile = p -> "begin 999 end       abc\n     begin$$$$end";
                 assertViolations(rule,
-                        "illegal regular expression /abc/",
-                        "illegal regular expression /begin.*end/");
+                        "illegal regular expression /abc/", 0,
+                        "illegal regular expression /begin.*end/", 0);
             }
         }
 
@@ -108,15 +108,15 @@ class TextRuleTest extends AbstractKiboshTest {
             @Test
             void OnlyOneRequiredStringPresent_SingleViolation() {
                 TextRule.readFile = p -> "abc";
-                assertViolations(rule, "required string \"xy\"");
+                assertSingleViolation(rule, "required string \"xy\"", 0);
             }
 
             @Test
             void NoRequiredStringsPresent_OneViolationForEachMissingString() {
                 TextRule.readFile = p -> "12345";
                 assertViolations(rule,
-                        "required string \"abc\"",
-                        "required string \"xy\"");
+                        "required string \"abc\"", 0,
+                        "required string \"xy\"", 0);
             }
         }
 
@@ -137,15 +137,15 @@ class TextRuleTest extends AbstractKiboshTest {
             @Test
             void OnlyOneRequiredRegularExpressionPresent_SingleViolation() {
                 TextRule.readFile = p -> "other.. abc ^&*$%#";
-                assertViolations(rule, "required regular expression /begin.*end/");
+                assertSingleViolation(rule, "required regular expression /begin.*end/", 0);
             }
 
             @Test
             void NoRequiredRegularExpressionsPresent_OneViolationForEachMissingRegularExpression() {
                 TextRule.readFile = p -> "12345";
                 assertViolations(rule,
-                        "required regular expression /abc/",
-                        "required regular expression /begin.*end/");
+                        "required regular expression /abc/", 0,
+                        "required regular expression /begin.*end/", 0);
             }
         }
 
@@ -180,7 +180,7 @@ class TextRuleTest extends AbstractKiboshTest {
                         .excludeFilename("*.txt")
                         .build();
                 TextRule.readFile = p -> "abc";
-                assertViolations(rule, "abc");
+                assertSingleViolation(rule, "abc", 0);
             }
 
         }
@@ -196,7 +196,7 @@ class TextRuleTest extends AbstractKiboshTest {
                         .build();
                 TextRule.readFile = p -> "abc";
                 expectedSeverity = WARNING;
-                assertViolations(rule, "abc");
+                assertSingleViolation(rule, "abc", 0);
             }
 
         }
@@ -212,18 +212,32 @@ class TextRuleTest extends AbstractKiboshTest {
             assertThat(violations).isEmpty();
         }
 
-        private void assertViolations(Rule rule, String... violationMessages) {
+        private void assertSingleViolation(Rule rule, String violationMessage, int lineNumber) {
             List<Violation> violations = rule.applyToFile(PATH);
             log.info("violations={}", violations);
 
-            assertThat(violations).hasSize(violationMessages.length);
-            int messageIndex = 0;
-            for (Violation violation: violations) {
-                assertThat(violation.getRule()).isEqualTo(rule);
-                assertThat(violation.getSeverity()).isEqualTo(expectedSeverity);
-                assertThat(violation.getMessage()).contains(NAME, DESCRIPTION, violationMessages[messageIndex]);
-                messageIndex++;
-            }
+            assertThat(violations).hasSize(1);
+            assertThat(violations.get(0).getRule()).isEqualTo(rule);
+            assertThat(violations.get(0).getSeverity()).isEqualTo(expectedSeverity);
+            assertThat(violations.get(0).getMessage()).contains(NAME, DESCRIPTION, violationMessage);
+            assertThat(violations.get(0).getLineNumber()).isEqualTo(lineNumber);
+        }
+
+        private void assertViolations(Rule rule, String message1, int lineNumber1, String message2, int lineNumber2) {
+            List<Violation> violations = rule.applyToFile(PATH);
+            log.info("violations={}", violations);
+
+            assertThat(violations).hasSize(2);
+
+            assertThat(violations.get(0).getRule()).isEqualTo(rule);
+            assertThat(violations.get(0).getSeverity()).isEqualTo(expectedSeverity);
+            assertThat(violations.get(0).getMessage()).contains(NAME, DESCRIPTION, message1);
+            assertThat(violations.get(0).getLineNumber()).isEqualTo(lineNumber1);
+
+            assertThat(violations.get(1).getRule()).isEqualTo(rule);
+            assertThat(violations.get(1).getSeverity()).isEqualTo(expectedSeverity);
+            assertThat(violations.get(1).getMessage()).contains(NAME, DESCRIPTION, message2);
+            assertThat(violations.get(1).getLineNumber()).isEqualTo(lineNumber2);
         }
 
     }
