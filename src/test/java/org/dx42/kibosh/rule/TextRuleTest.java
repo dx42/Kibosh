@@ -79,15 +79,23 @@ class TextRuleTest extends AbstractKiboshTest {
             @Test
             void SingleOccurrence_SingleViolation() {
                 TextRule.readFile = p -> "other.. abc ^&*$%#";
-                assertSingleViolation(rule, "illegal regular expression /abc/", 0);
+                assertSingleViolation(rule, "illegal regular expression /abc/", 1);
             }
 
             @Test
-            void MultipleOccurrences_MultipleViolations() {
-                TextRule.readFile = p -> "begin 999 end       abc\n     begin$$$$end";
+            void MultipleStrings_MultipleViolations() {
+                TextRule.readFile = p -> "b 999 end       abc\n     begin$$$$end";
                 assertViolations(rule,
-                        "illegal regular expression /abc/", 0,
-                        "illegal regular expression /begin.*end/", 0);
+                        "illegal regular expression /abc/", 1,
+                        "illegal regular expression /begin.*end/", 2);
+            }
+
+            @Test
+            void SameString_MultipleOccurrences_MultipleViolations() {
+                TextRule.readFile = p -> "xabcx \n   \n Some Other Line \n  abc";
+                assertViolations(rule,
+                        "illegal regular expression /abc/", 1,
+                        "illegal regular expression /abc/", 4);
             }
         }
 

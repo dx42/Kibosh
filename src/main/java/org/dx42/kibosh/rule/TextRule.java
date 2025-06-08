@@ -91,9 +91,11 @@ public class TextRule implements Rule {
         for (String illegalRegex: illegalRegularExpressions) {
             Pattern pattern = patternForRegex(illegalRegex);
             Matcher matcher = pattern.matcher(fileContents);
-            if (matcher.find()) {
+            while (matcher.find()) {
+                int startIndex = matcher.start();
+                int lineNumber = getLineNumber(fileContents, startIndex);
                 String message = messagePrefix(path) + "contains illegal regular expression /" +  illegalRegex + "/";
-                addViolation(violations, message);
+                addViolation(violations, message, lineNumber);
             }
         }
     }
@@ -130,10 +132,15 @@ public class TextRule implements Rule {
     }
 
     private void addViolation(List<Violation> violations, String message) {
+        addViolation(violations, message, 0);
+    }
+
+    private void addViolation(List<Violation> violations, String message, int lineNumber) {
         Violation violation = Violation.builder()
                 .rule(this)
                 .severity(severity)
                 .message(message)
+                .lineNumber(lineNumber)
                 .build();
         violations.add(violation);
     }
@@ -149,5 +156,12 @@ public class TextRule implements Rule {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static int getLineNumber(String content, int index) {
+        if (index < 0 || index >= content.length()) {
+            throw new IndexOutOfBoundsException("Index out of bounds: " + index);
+        }
+        return content.substring(0, index).split("\n", -1).length;
     }
 }

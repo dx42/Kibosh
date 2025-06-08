@@ -1,5 +1,9 @@
 # Kibosh Change Log
 
+## TODO: Version 1.1.0 (??? 2025)
+ - #1: TextRule: For illegalString, include line number; create violation for each occurrence.
+
+
 ## Version 1.0.0
  - `TextRule`: Add support for `requiredString` and `requiredRegularExpression`.
  - `KiboshRunner`: Make files to apply to configurable using new *applyToFileNames* property.
