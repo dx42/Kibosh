@@ -50,15 +50,23 @@ class TextRuleTest extends AbstractKiboshTest {
             @Test
             void SingleOccurrence_SingleViolation() {
                 TextRule.readFile = p -> "abc";
-                assertSingleViolation(rule, "illegal string \"abc\"", 0);
+                assertSingleViolation(rule, "illegal string \"abc\"", 1);
             }
 
             @Test
             void MultipleOccurrences_MultipleViolations() {
-                TextRule.readFile = p -> "abc\n     xy   xy";
+                TextRule.readFile = p -> "xy\n     xxx   abc\n other";
                 assertViolations(rule,
-                        "illegal string \"abc\"", 0,
-                        "illegal string \"xy\"", 0);
+                        "illegal string \"abc\"", 2,
+                        "illegal string \"xy\"", 1);
+            }
+
+            @Test
+            void SameString_MultipleOccurrences_MultipleViolations() {
+                TextRule.readFile = p -> "xabcx \n   \n Some Other Line \n  abc";
+                assertViolations(rule,
+                        "illegal string \"abc\"", 1,
+                        "illegal string \"abc\"", 4);
             }
         }
 
@@ -188,7 +196,7 @@ class TextRuleTest extends AbstractKiboshTest {
                         .excludeFilename("*.txt")
                         .build();
                 TextRule.readFile = p -> "abc";
-                assertSingleViolation(rule, "abc", 0);
+                assertSingleViolation(rule, "abc", 1);
             }
 
         }
@@ -204,7 +212,7 @@ class TextRuleTest extends AbstractKiboshTest {
                         .build();
                 TextRule.readFile = p -> "abc";
                 expectedSeverity = WARNING;
-                assertSingleViolation(rule, "abc", 0);
+                assertSingleViolation(rule, "abc", 1);
             }
 
         }

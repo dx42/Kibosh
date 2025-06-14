@@ -80,9 +80,12 @@ public class TextRule implements Rule {
 
     private void checkForIllegalStrings(Path path, String fileContents, List<Violation> violations) {
         for (String illegalString: illegalStrings) {
-            if (fileContents.contains(illegalString)) {
-                String message = messagePrefix(path) + "contains illegal string " +  quoted(illegalString);
-                addViolation(violations, message);
+            int startIndex = 0;
+            while ((startIndex = fileContents.indexOf(illegalString, startIndex)) != -1) {
+                String message = messagePrefix(path) + "contains illegal string " + quoted(illegalString);
+                int lineNumber = getLineNumber(fileContents, startIndex);
+                addViolation(violations, message, lineNumber);
+                startIndex += illegalString.length();
             }
         }
     }
