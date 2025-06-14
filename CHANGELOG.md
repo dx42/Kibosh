@@ -1,7 +1,9 @@
 # Kibosh Change Log
 
-## TODO: Version 1.1.0 (??? 2025)
- - #1: TextRule: For illegalString, include line number; create violation for each occurrence.
+## Version 1.1.0 (Jun 2025)
+ - #1: TextRule: For illegalRegularExpression, include line number; create violation for each occurrence.
+ - #2: TextRule: For illegalString, include line number; create violation for each occurrence.
+ - build.gradle: Use constants for other duplicated values.
 
 
 ## Version 1.0.0

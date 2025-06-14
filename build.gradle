@@ -11,7 +11,11 @@ plugins {
 
 def GROUP_ID = "org.dx42"
 def ARTIFACT_ID = "Kibosh"
-def VERSION = "1.0.0"
+def VERSION = "1.1.0"
+def LICENSE_NAME = 'The Apache License, Version 2.0'
+def LICENSE_TEXT_URL = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+def GIT_SCM_URL = 'scm:git:git@github.com:dx42/Kibosh.git'
+def GITHUB_REPOSITORY_URL = 'https://github.com/dx42/Kibosh'
 
 version = VERSION
 group = GROUP_ID
@@ -67,11 +71,11 @@ sonatypeCentralPublishExtension {
     pom {
         name.set("Kibosh")
         description.set("The Kibosh project provides simple static analysis for Java source files designed to be run as part of a test suite.")
-        url.set("https://github.com/dx42/Kibosh")
+        url.set(GITHUB_REPOSITORY_URL)
         licenses {
             license {
-                name.set('The Apache License, Version 2.0')
-                url.set('http://www.apache.org/licenses/LICENSE-2.0.txt')
+                name.set(LICENSE_NAME)
+                url.set(LICENSE_TEXT_URL)
             }
         }
         developers {
@@ -83,13 +87,13 @@ sonatypeCentralPublishExtension {
             }
         }
         scm {
-            url.set("https://github.com/dx42/Kibosh")
-            connection.set('scm:git:git@github.com:dx42/Kibosh.git')
-            developerConnection.set('scm:git:git@github.com:dx42/Kibosh.git')
+            url.set(GITHUB_REPOSITORY_URL)
+            connection.set(GIT_SCM_URL)
+            developerConnection.set(GIT_SCM_URL)
         }
         issueManagement {
             system.set("GitHub")
-            url.set("https://github.com/dx42/Kibosh.git/issues")
+            url.set(GITHUB_REPOSITORY_URL + "/issues")
         }
     }
 }
@@ -104,18 +108,18 @@ publishing {
             pom {
                 name = 'Kibosh'
                 description = 'The Kibosh project provides simple static analysis for Java source files designed to be run as part of a test suite.'
-                url = 'https://github.com/dx42/Kibosh'
+                url = GITHUB_REPOSITORY_URL
 
                 scm {
-                    connection = 'scm:git:git@github.com:dx42/Kibosh.git'
-                    developerConnection = 'scm:git:git@github.com:dx42/Kibosh.git'
-                    url = 'scm:git:git@github.com:dx42/Kibosh.git'
+                    connection = GIT_SCM_URL
+                    developerConnection = GIT_SCM_URL
+                    url = GIT_SCM_URL
                 }
 
                 licenses {
                     license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        name = LICENSE_NAME
+                        url = LICENSE_TEXT_URL
                     }
                 }
 
