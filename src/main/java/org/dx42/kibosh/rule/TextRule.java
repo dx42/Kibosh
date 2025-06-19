@@ -82,8 +82,8 @@ public class TextRule implements Rule {
         for (String illegalString: illegalStrings) {
             int startIndex = 0;
             while ((startIndex = fileContents.indexOf(illegalString, startIndex)) != -1) {
-                String message = messagePrefix(path) + "contains illegal string " + quoted(illegalString);
                 int lineNumber = getLineNumber(fileContents, startIndex);
+                String message = messagePrefix(path, lineNumber) + "contains illegal string " + quoted(illegalString);
                 addViolation(violations, message, lineNumber);
                 startIndex += illegalString.length();
             }
@@ -97,7 +97,7 @@ public class TextRule implements Rule {
             while (matcher.find()) {
                 int startIndex = matcher.start();
                 int lineNumber = getLineNumber(fileContents, startIndex);
-                String message = messagePrefix(path) + "contains illegal regular expression /" +  illegalRegex + "/";
+                String message = messagePrefix(path, lineNumber) + "contains illegal regular expression /" +  illegalRegex + "/";
                 addViolation(violations, message, lineNumber);
             }
         }
@@ -106,7 +106,7 @@ public class TextRule implements Rule {
     private void checkForRequiredStrings(Path path, String fileContents, List<Violation> violations) {
         for (String requiredString: requiredStrings) {
             if (!fileContents.contains(requiredString)) {
-                String message = messagePrefix(path) + "does not contain required string " +  quoted(requiredString);
+                String message = messagePrefix(path, 1) + "does not contain required string " +  quoted(requiredString);
                 addViolation(violations, message);
             }
         }
@@ -117,14 +117,14 @@ public class TextRule implements Rule {
             Pattern pattern = patternForRegex(requiredRegex);
             Matcher matcher = pattern.matcher(fileContents);
             if (!matcher.find()) {
-                String message = messagePrefix(path) + "does not contain required regular expression /" +  requiredRegex + "/";
+                String message = messagePrefix(path, 1) + "does not contain required regular expression /" +  requiredRegex + "/";
                 addViolation(violations, message);
             }
         }
     }
 
-    private String messagePrefix(Path path) {
-        return name + ": " + quoted(description) + "; " + "File=.(" + path.getFileName() + ":1) ";
+    private String messagePrefix(Path path, int lineNumber) {
+        return name + ": " + quoted(description) + "; " + "File=.(" + path.getFileName() + ":" + lineNumber + ") ";
     }
 
     private Pattern patternForRegex(String regex) {
@@ -135,7 +135,7 @@ public class TextRule implements Rule {
     }
 
     private void addViolation(List<Violation> violations, String message) {
-        addViolation(violations, message, 0);
+        addViolation(violations, message, 1);
     }
 
     private void addViolation(List<Violation> violations, String message, int lineNumber) {

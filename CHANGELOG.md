@@ -1,5 +1,9 @@
 # Kibosh Change Log
 
+## Version 1.1.1 (Jun 2025)
+ - #3: TextRule: Include actual line number in violation message logged to console.
+
+
 ## Version 1.1.0 (Jun 2025)
  - #1: TextRule: For illegalRegularExpression, include line number; create violation for each occurrence.
  - #2: TextRule: For illegalString, include line number; create violation for each occurrence.

@@ -139,15 +139,15 @@ class TextRuleTest extends AbstractKiboshTest {
             void OnlyOneRequiredStringPresent_SingleViolation() {
                 TextRule.readFile = p -> "abc";
                 assertViolations(
-                        violation("required string \"xy\"", 0));
+                        violation("required string \"xy\"", 1));
             }
 
             @Test
             void NoRequiredStringsPresent_OneViolationForEachMissingString() {
                 TextRule.readFile = p -> "12345";
                 assertViolations(
-                        violation("required string \"abc\"", 0),
-                        violation("required string \"xy\"", 0));
+                        violation("required string \"abc\"", 1),
+                        violation("required string \"xy\"", 1));
             }
         }
 
@@ -172,15 +172,15 @@ class TextRuleTest extends AbstractKiboshTest {
             @Test
             void OnlyOneRequiredRegularExpressionPresent_SingleViolation() {
                 TextRule.readFile = p -> "other.. abc ^&*$%#";
-                assertViolations(violation("required regular expression /begin.*end/", 0));
+                assertViolations(violation("required regular expression /begin.*end/", 1));
             }
 
             @Test
             void NoRequiredRegularExpressionsPresent_OneViolationForEachMissingRegularExpression() {
                 TextRule.readFile = p -> "12345";
                 assertViolations(
-                        violation("required regular expression /abc/", 0),
-                        violation("required regular expression /begin.*end/", 0));
+                        violation("required regular expression /abc/", 1),
+                        violation("required regular expression /begin.*end/", 1));
             }
         }
 
@@ -263,9 +263,10 @@ class TextRuleTest extends AbstractKiboshTest {
             assertThat(violations).hasSize(expectedViolations.length);
             for (int i = 0; i < expectedViolations.length; i++) {
                 Violation expected = expectedViolations[i];
+                String expectedLineNumber = ":" + expected.getLineNumber();
                 assertThat(violations.get(i).getRule()).isEqualTo(rule);
                 assertThat(violations.get(i).getSeverity()).isEqualTo(expected.getSeverity());
-                assertThat(violations.get(i).getMessage()).contains(NAME, DESCRIPTION, expected.getMessage());
+                assertThat(violations.get(i).getMessage()).contains(NAME, DESCRIPTION, expected.getMessage(), expectedLineNumber);
                 assertThat(violations.get(i).getLineNumber()).isEqualTo(expected.getLineNumber());
             }
         }
