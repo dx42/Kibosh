@@ -11,7 +11,7 @@ plugins {
 
 def GROUP_ID = "org.dx42"
 def ARTIFACT_ID = "Kibosh"
-def VERSION = "1.1.0"
+def VERSION = "1.1.1"
 def LICENSE_NAME = 'The Apache License, Version 2.0'
 def LICENSE_TEXT_URL = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
 def GIT_SCM_URL = 'scm:git:git@github.com:dx42/Kibosh.git'
